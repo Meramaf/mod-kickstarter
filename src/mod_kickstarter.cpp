@@ -47,18 +47,39 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Survival", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_ROGUE:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Assassination", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Combat", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Subtlety", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_PRIEST:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Discipline", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Holy", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Shadow", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_DEATH_KNIGHT:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Blood", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Frost", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Unholy", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_SHAMAN:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Elemental", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Enhancement", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Restoration", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_MAGE:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Arcane", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Fire", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Frost", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_WARLOCK:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Affliction", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Demonology", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Destruction", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         case CLASS_DRUID:
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Balance", GOSSIP_SENDER_MAIN, SPECIALIZATION_1, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Feral", GOSSIP_SENDER_MAIN, SPECIALIZATION_2, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "I want to use Restoration", GOSSIP_SENDER_MAIN, SPECIALIZATION_3, "Are you absolutely certain you want to do this? All of your current equipment will be deleted!", 0, false);
             break;
         }
 
@@ -88,7 +109,13 @@ private:
     {
         if (!HasToken(player))
         {
-            ChatHandler(player->GetSession()).PSendSysMessage("You have no tokens available.");
+            ChatHandler(player->GetSession()).SendSysMessage("You have no tokens available.");
+            return;
+        }
+
+        if (player->getLevel() > kickstarterLevel)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("This feature can only be used at or below level %i.", kickstarterLevel);
             return;
         }
 
@@ -239,6 +266,23 @@ private:
                     player->SetSkill(SKILL_MACES, 0, player->GetMaxSkillValue(SKILL_2H_MACES), player->GetMaxSkillValue(SKILL_2H_MACES));
                 }
             }
+            break;
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+        case CLASS_DRUID:
+            if (player->getClass() == CLASS_PRIEST || player->getClass() == CLASS_MAGE || player->getClass() == CLASS_WARLOCK)
+            {
+                if (!player->HasSkill(SKILL_WANDS))
+                    player->learnSpell(5009);
+
+                player->SetSkill(SKILL_WANDS, 0, player->GetMaxSkillValue(SKILL_WANDS), player->GetMaxSkillValue(SKILL_WANDS));
+            }
+
+            if (!player->HasSkill(SKILL_STAVES))
+                player->learnSpell(227);
+
+            player->SetSkill(SKILL_STAVES, 0, player->GetMaxSkillValue(SKILL_STAVES), player->GetMaxSkillValue(SKILL_STAVES));
             break;
         default:
             break;
@@ -511,6 +555,44 @@ private:
         case CLASS_ROGUE:
             break;
         case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14332 : 24681;
+            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -37;
+            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12027 : 25070;
+            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
+            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 14335 : 24683;
+            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -37;
+            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
+            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
+            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 14328 : 24679;
+            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -37;
+            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 14337 : 24677;
+            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -37;
+            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 14334 : 24682;
+            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 888 : -37;
+            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 14329 : 24678;
+            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -37;
+            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 14330 : 24684;
+            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
+            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 14333 : 24680;
+            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 879 : -37;
+            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 11992 : 25056;
+            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
+            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 12017 : 25055;
+            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -39;
+            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
+            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
+            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
+            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
+            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15278 : 25181;
+            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 802 : -39;
+            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = level == 60 ? 15283 : 25294;
+            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = level == 60 ? 854 : -39;
             break;
         case CLASS_DEATH_KNIGHT:
             equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14979 : 25018;
@@ -551,10 +633,6 @@ private:
             equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
             break;
         case CLASS_SHAMAN: // Elemental, Enhancement, Restoration
-            break;
-        case CLASS_MAGE:
-            break;
-        case CLASS_WARLOCK:
             break;
         case CLASS_DRUID: // Balance, Feral, Restoration
             break;
