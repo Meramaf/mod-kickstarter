@@ -1,4 +1,18 @@
 [worldserver]
 
+###############
+#
+# Require tokens to use the kickstarter feature
+#
 Kickstarter.RequireToken = 1
+###############
+
+###############
+#
+# The level that the player will be set to
+# and the equipment they will get
+# Accepted options are 60 and 70
+# An invalid value will reset it to 60
+#
 Kickstarter.Level = 60
+###############
