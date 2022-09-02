@@ -1,1 +1,4 @@
 [worldserver]
+
+Kickstarter.RequireToken = 1
+Kickstarter.Level = 60

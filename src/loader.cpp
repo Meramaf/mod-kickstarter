@@ -1,6 +1,6 @@
-void AddKickstarterScripts();
+void AddSC_mod_kickstarter();
 
 void Addmod_kickstarterScripts()
 {
-    AddKickstarterScripts();
+    AddSC_mod_kickstarter();
 }
