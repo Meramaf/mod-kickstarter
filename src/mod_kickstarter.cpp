@@ -292,57 +292,22 @@ private:
                 player->learnSpell(1180);
 
             player->SetSkill(SKILL_DAGGERS, 0, player->GetMaxSkillValue(SKILL_DAGGERS), player->GetMaxSkillValue(SKILL_DAGGERS));
+
+            if (!player->HasSkill(SKILL_THROWN))
+                player->learnSpell(2567);
+
+            player->SetSkill(SKILL_THROWN, 0, player->GetMaxSkillValue(SKILL_THROWN), player->GetMaxSkillValue(SKILL_THROWN));
             break;
         default:
             break;
         }
     }
 
-/*
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
-*/
-
     void SetEquipment(Player* player, uint32 specialization, uint32 level)
     {
         uint32 equipment[18][2];
 
-        uint32 playerClass = player->getClass();
-        switch (playerClass)
+        switch (player->getClass())
         {
         case CLASS_WARRIOR:
             equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14979 : 25018;
@@ -586,7 +551,6 @@ private:
             equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -40;
             equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11992 : 25055;
             equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 611 : -40;
-
             equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
             equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
             equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
@@ -678,9 +642,130 @@ private:
             equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
             equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
             break;
-        case CLASS_SHAMAN: // Elemental, Enhancement, Restoration
+        case CLASS_SHAMAN:
+            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 15684 : 24906;
+            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -39;
+            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12027 : 25070;
+            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
+            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 15686 : 24908;
+            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
+            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
+            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
+            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 15680 : 24904;
+            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -39;
+            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 15683 : 24902;
+            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 873 : -39;
+            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 15685 : 24907;
+            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 888 : -39;
+            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 15678 : 24903;
+            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
+            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 15679 : 24909;
+            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
+            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 15682 : 24905;
+            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
+            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25057;
+            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -39;
+            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11992 : 25056;
+            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 864 ? 611 : -39;
+            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
+            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
+            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
+            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
+            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15229 : 25323;
+            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 2040 : -44;
+            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 10367 : 25084;
+            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 384 : -39;
+            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+            if (specialization == SPECIALIZATION_2) // Enhancement
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -40;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 287 : -40;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 639 : -40;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 618 : -40;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -40;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -40;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 611 : -40;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15267 : 25140;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -5;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+            }
             break;
-        case CLASS_DRUID: // Balance, Feral, Restoration
+        case CLASS_DRUID:
+            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
+            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
+            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            if (specialization == SPECIALIZATION_1 || specialization == SPECIALIZATION_3) // Balance, Restoration
+            {
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
+            }
+            else if (specialization == SPECIALIZATION_2) // Feral
+            {
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
+            }
+            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+            if (specialization == SPECIALIZATION_2) // Feral
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : 0;
+            }
             break;
         }
 
