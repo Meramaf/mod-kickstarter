@@ -167,6 +167,8 @@ private:
 
             player->SetFullHealth();
             player->ResetAllPowers();
+
+            player->CheckAllAchievementCriteria();
         }
     }
 
