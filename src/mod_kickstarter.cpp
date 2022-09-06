@@ -122,6 +122,7 @@ private:
         SetPlayerLevel(player, kickstarterLevel);
         SetWeaponSkills(player, specialization);
         SetEquipment(player, specialization, kickstarterLevel);
+        AddTaxiPaths(player);
         RemoveToken(player);
     }
 
@@ -779,6 +780,7 @@ private:
             uint32 randomProperty = equipment[slot][ITEM_RANDOM_PROPERTY];
 
             if (itemId > 0)
+            {
                 if (sObjectMgr->GetItemTemplate(itemId))
                 {
                     if (Item* item = Item::CreateItem(itemId, 1, player, false, randomProperty > 0 ? randomProperty : 0))
@@ -789,6 +791,135 @@ private:
                         player->EquipItem(slot, item, true);
                     }
                 }
+            }
+        }
+    }
+
+    void AddTaxiPaths(Player* player)
+    {
+        player->GetSession()->SendDiscoverNewTaxiNode(79);
+        player->GetSession()->SendDiscoverNewTaxiNode(80);
+        player->GetSession()->SendDiscoverNewTaxiNode(166);
+        player->GetSession()->SendDiscoverNewTaxiNode(179);
+        player->GetSession()->SendDiscoverNewTaxiNode(205);
+        player->GetSession()->SendDiscoverNewTaxiNode(383);
+
+        if (player->GetTeamId() == TEAM_ALLIANCE)
+        {
+            player->GetSession()->SendDiscoverNewTaxiNode(2);
+            player->GetSession()->SendDiscoverNewTaxiNode(4);
+            player->GetSession()->SendDiscoverNewTaxiNode(5);
+            player->GetSession()->SendDiscoverNewTaxiNode(6);
+            player->GetSession()->SendDiscoverNewTaxiNode(7);
+            player->GetSession()->SendDiscoverNewTaxiNode(8);
+            player->GetSession()->SendDiscoverNewTaxiNode(12);
+            player->GetSession()->SendDiscoverNewTaxiNode(14);
+            player->GetSession()->SendDiscoverNewTaxiNode(15);
+            player->GetSession()->SendDiscoverNewTaxiNode(16);
+            player->GetSession()->SendDiscoverNewTaxiNode(19);
+            player->GetSession()->SendDiscoverNewTaxiNode(26);
+            player->GetSession()->SendDiscoverNewTaxiNode(27);
+            player->GetSession()->SendDiscoverNewTaxiNode(28);
+            player->GetSession()->SendDiscoverNewTaxiNode(31);
+            player->GetSession()->SendDiscoverNewTaxiNode(32);
+            player->GetSession()->SendDiscoverNewTaxiNode(33);
+            player->GetSession()->SendDiscoverNewTaxiNode(37);
+            player->GetSession()->SendDiscoverNewTaxiNode(38);
+            player->GetSession()->SendDiscoverNewTaxiNode(41);
+            player->GetSession()->SendDiscoverNewTaxiNode(43);
+            player->GetSession()->SendDiscoverNewTaxiNode(45);
+            player->GetSession()->SendDiscoverNewTaxiNode(49);
+            player->GetSession()->SendDiscoverNewTaxiNode(52);
+            player->GetSession()->SendDiscoverNewTaxiNode(62);
+            player->GetSession()->SendDiscoverNewTaxiNode(64);
+            player->GetSession()->SendDiscoverNewTaxiNode(65);
+            player->GetSession()->SendDiscoverNewTaxiNode(66);
+            player->GetSession()->SendDiscoverNewTaxiNode(67);
+            player->GetSession()->SendDiscoverNewTaxiNode(71);
+            player->GetSession()->SendDiscoverNewTaxiNode(73);
+            player->GetSession()->SendDiscoverNewTaxiNode(74);
+            player->GetSession()->SendDiscoverNewTaxiNode(93);
+            player->GetSession()->SendDiscoverNewTaxiNode(94);
+            player->GetSession()->SendDiscoverNewTaxiNode(167);
+            player->GetSession()->SendDiscoverNewTaxiNode(195);
+        }
+        else if (player->GetTeamId() == TEAM_HORDE)
+        {
+            player->GetSession()->SendDiscoverNewTaxiNode(10);
+            player->GetSession()->SendDiscoverNewTaxiNode(11);
+            player->GetSession()->SendDiscoverNewTaxiNode(13);
+            player->GetSession()->SendDiscoverNewTaxiNode(17);
+            player->GetSession()->SendDiscoverNewTaxiNode(18);
+            player->GetSession()->SendDiscoverNewTaxiNode(20);
+            player->GetSession()->SendDiscoverNewTaxiNode(21);
+            player->GetSession()->SendDiscoverNewTaxiNode(22);
+            player->GetSession()->SendDiscoverNewTaxiNode(23);
+            player->GetSession()->SendDiscoverNewTaxiNode(25);
+            player->GetSession()->SendDiscoverNewTaxiNode(29);
+            player->GetSession()->SendDiscoverNewTaxiNode(30);
+            player->GetSession()->SendDiscoverNewTaxiNode(38);
+            player->GetSession()->SendDiscoverNewTaxiNode(40);
+            player->GetSession()->SendDiscoverNewTaxiNode(42);
+            player->GetSession()->SendDiscoverNewTaxiNode(44);
+            player->GetSession()->SendDiscoverNewTaxiNode(48);
+            player->GetSession()->SendDiscoverNewTaxiNode(53);
+            player->GetSession()->SendDiscoverNewTaxiNode(55);
+            player->GetSession()->SendDiscoverNewTaxiNode(56);
+            player->GetSession()->SendDiscoverNewTaxiNode(58);
+            player->GetSession()->SendDiscoverNewTaxiNode(61);
+            player->GetSession()->SendDiscoverNewTaxiNode(63);
+            player->GetSession()->SendDiscoverNewTaxiNode(68);
+            player->GetSession()->SendDiscoverNewTaxiNode(69);
+            player->GetSession()->SendDiscoverNewTaxiNode(70);
+            player->GetSession()->SendDiscoverNewTaxiNode(72);
+            player->GetSession()->SendDiscoverNewTaxiNode(75);
+            player->GetSession()->SendDiscoverNewTaxiNode(76);
+            player->GetSession()->SendDiscoverNewTaxiNode(77);
+            player->GetSession()->SendDiscoverNewTaxiNode(82);
+            player->GetSession()->SendDiscoverNewTaxiNode(83);
+            player->GetSession()->SendDiscoverNewTaxiNode(384);
+        }
+
+        if (kickstarterLevel == 70)
+        {
+            player->GetSession()->SendDiscoverNewTaxiNode(122);
+            player->GetSession()->SendDiscoverNewTaxiNode(128);
+            player->GetSession()->SendDiscoverNewTaxiNode(139);
+            player->GetSession()->SendDiscoverNewTaxiNode(140);
+            player->GetSession()->SendDiscoverNewTaxiNode(150);
+            player->GetSession()->SendDiscoverNewTaxiNode(159);
+            player->GetSession()->SendDiscoverNewTaxiNode(160);
+            player->GetSession()->SendDiscoverNewTaxiNode(213);
+
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                player->GetSession()->SendDiscoverNewTaxiNode(100);
+                player->GetSession()->SendDiscoverNewTaxiNode(101);
+                player->GetSession()->SendDiscoverNewTaxiNode(117);
+                player->GetSession()->SendDiscoverNewTaxiNode(119);
+                player->GetSession()->SendDiscoverNewTaxiNode(122);
+                player->GetSession()->SendDiscoverNewTaxiNode(124);
+                player->GetSession()->SendDiscoverNewTaxiNode(125);
+                player->GetSession()->SendDiscoverNewTaxiNode(129);
+                player->GetSession()->SendDiscoverNewTaxiNode(149);
+                player->GetSession()->SendDiscoverNewTaxiNode(156);
+                player->GetSession()->SendDiscoverNewTaxiNode(164);
+            }
+            else if (player->GetTeamId() == TEAM_HORDE)
+            {
+                player->GetSession()->SendDiscoverNewTaxiNode(99);
+                player->GetSession()->SendDiscoverNewTaxiNode(102);
+                player->GetSession()->SendDiscoverNewTaxiNode(118);
+                player->GetSession()->SendDiscoverNewTaxiNode(120);
+                player->GetSession()->SendDiscoverNewTaxiNode(123);
+                player->GetSession()->SendDiscoverNewTaxiNode(126);
+                player->GetSession()->SendDiscoverNewTaxiNode(127);
+                player->GetSession()->SendDiscoverNewTaxiNode(130);
+                player->GetSession()->SendDiscoverNewTaxiNode(141);
+                player->GetSession()->SendDiscoverNewTaxiNode(142);
+                player->GetSession()->SendDiscoverNewTaxiNode(151);
+                player->GetSession()->SendDiscoverNewTaxiNode(163);
+            }
         }
     }
 
