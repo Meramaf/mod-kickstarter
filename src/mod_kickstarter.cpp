@@ -7,6 +7,9 @@
 bool kickstarterRequireToken;
 uint32 kickstarterLevel;
 
+bool kickstarterMoney;
+uint32 kickstarterMoneyAmount[3];
+
 enum KickstarterSpecialization
 {
     SPECIALIZATION_1 = 0,
@@ -113,9 +116,9 @@ private:
             return;
         }
 
-        if (player->getLevel() > kickstarterLevel)
+        if (player->getLevel() >= kickstarterLevel)
         {
-            ChatHandler(player->GetSession()).PSendSysMessage("This feature can only be used at or below level %i.", kickstarterLevel);
+            ChatHandler(player->GetSession()).PSendSysMessage("This feature can only be used below level %i.", kickstarterLevel);
             return;
         }
 
@@ -123,6 +126,7 @@ private:
         SetWeaponSkills(player, specialization);
         SetEquipment(player, specialization, kickstarterLevel);
         AddTaxiPaths(player);
+        AddMoney(player);
         RemoveToken(player);
     }
 
@@ -310,464 +314,1288 @@ private:
     {
         uint32 equipment[18][2];
 
+        equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
+        equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
+        equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
+        equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
+
         switch (player->getClass())
         {
         case CLASS_WARRIOR:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14979 : 25018;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12048 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1208 : -41;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 14981 : 25028;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 2151 : -41;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 14975 : 25008;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 14977 : 25014;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 2151 : -41;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 14980 : 25019;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 2158 : -41;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 14978 : 25015;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 2154 : -41;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 14983 : 25021;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1205 : -41;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 14976 : 25017;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1217 : -41;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 1208 : -41;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11980 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 1206 : -41;
-            if (specialization == SPECIALIZATION_1 || specialization == SPECIALIZATION_2) // Arms, Fury
+            if (kickstarterLevel == 60)
             {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
-            }
-            else if (specialization == SPECIALIZATION_3) // Protection
-            {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 1490 : 25787;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 4130 : 25996;
-            }
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 15437 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1205 : -41;
-            if (specialization == SPECIALIZATION_1) // Arms
-            {
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15221 : 25154;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1199 : -41;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 15219 : 25153;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1197 : -41;
-            }
-            else if (specialization == SPECIALIZATION_2) // Fury
-            {
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15256 : 25168;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1226 : -41;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            }
-            else if (specialization == SPECIALIZATION_3) // Protection
-            {
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15221 : 25154;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1199 : -41;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 14982 : 25084;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1197 : -41;
-            }
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = level == 60 ? 15289 : 25252;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = level == 60 ? 683 : -41;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 14979;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 1232;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12048;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 1208;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 14981;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 2151;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 14975;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 1232;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 14977;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 2151;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 14980;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 2158;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 14978;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 2154;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 14983;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 1205;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 14976;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 1217;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 1208;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 11980;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 1206;
+                if (specialization == SPECIALIZATION_1 || specialization == SPECIALIZATION_2) // Arms, Fury
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 17774;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 5079;
+                }
+                else if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 1490;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 4130;
+                }
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 15437;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 1205;
+                if (specialization == SPECIALIZATION_1) // Arms
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15221;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 1199;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 15219;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 1197;
+                }
+                else if (specialization == SPECIALIZATION_2) // Fury
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15256;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 1226;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                else if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15221;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 1199;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 14982;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 1197;
+                }
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 15289;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 683;
 
-            if (specialization == SPECIALIZATION_3) // Protection
+                if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 1231;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 1207;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 338;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 346;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 1213;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 1228;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 338;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 287;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 1216;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 333;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 333;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 287;
+                    equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 185;
+                }
+            }
+            else if (kickstarterLevel == 70)
             {
-                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 1231 : -16;
-                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1207 : -16;
-                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 338 : -16;
-                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 346 : -16;
-                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 1213 : -16;
-                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1228 : -16;
-                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 338 : -16;
-                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 287 : -16;
-                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1216 : -16;
-                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 333 : -16;
-                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 333 : -16;
-                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 287 : -16;
-                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = level == 60 ? 185 : -16;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 25018;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 25028;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 25008;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 25014;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 25019;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 25015;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 25021;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 25017;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -41;
+                if (specialization == SPECIALIZATION_1 || specialization == SPECIALIZATION_2) // Arms, Fury
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                }
+                else if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 25787;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25996;
+                }
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -41;
+                if (specialization == SPECIALIZATION_1) // Arms
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25154;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 25153;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -41;
+                }
+                else if (specialization == SPECIALIZATION_2) // Fury
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25168;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                else if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25154;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 25084;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -41;
+                }
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 25252;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -41;
+
+                if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -16;
+                }
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36327;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36329;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36325;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36323;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36328;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36324;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36330;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36326;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -7;
+                if (specialization == SPECIALIZATION_1) // Arms
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 38146;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 38198;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                else if (specialization == SPECIALIZATION_2) // Fury
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 38181;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                else if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 38146;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 36449;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -45;
+                }
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 38157;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_3) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -45;
+                }
             }
             break;
         case CLASS_PALADIN:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14979 : 25018;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -9;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12048 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 784 : -44;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 14981 : 25028;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -44;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 14975 : 25008;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -44;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 14977 : 25014;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 873 : -44;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 14980 : 25019;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 888 : -44;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 14978 : 25015;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -44;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 14983 : 25021;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -44;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 14976 : 25017;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -44;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -44;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11980 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 868 : -44;
-            if (specialization == SPECIALIZATION_1) // Holy
+            if (kickstarterLevel == 60)
             {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
-            }
-            else if (specialization == SPECIALIZATION_2) // Protection
-            {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 1490 : 25787;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 4130 : 25996;
-            }
-            else if (specialization == SPECIALIZATION_3) // Retribution
-            {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
-            }
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 15437 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -44;
-            if (specialization == SPECIALIZATION_1) // Holy
-            {
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15229 : 25322;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 2040 : -44;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 14982 : 25084;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 2043 : -44;
-            }
-            else if (specialization == SPECIALIZATION_2) // Protection
-            {
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15221 : 25154;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1199 : -41;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 14982 : 25084;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1197 : -41;
-            }
-            else if (specialization == SPECIALIZATION_3) // Retribution
-            {
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15256 : 25168;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1226 : -41;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            }
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 14979;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12048;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 784;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 14981;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 14975;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 14977;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 873;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 14980;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 888;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 14978;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 14983;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 14976;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 867;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 11980;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 868;
+                if (specialization == SPECIALIZATION_1) // Holy
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 10659;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 17774;
+                }
+                else if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 1490;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 4130;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 17774;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 5079;
+                }
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 15437;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 864;
+                if (specialization == SPECIALIZATION_1) // Holy
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15229;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 2040;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 14982;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 2043;
+                }
+                else if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15221;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 1199;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 14982;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 1197;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15256;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 1226;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
 
-            if (specialization == SPECIALIZATION_2) // Protection
-            {
-                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 1231 : -16;
-                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1207 : -16;
-                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 338 : -16;
-                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 346 : -16;
-                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 1213 : -16;
-                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1228 : -16;
-                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 338 : -16;
-                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 287 : -16;
-                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1216 : -16;
-                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 333 : -16;
-                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 333 : -16;
-                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 287 : -16;
+                if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 1231;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 1207;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 338;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 346;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 1213;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 1228;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 338;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 287;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 1216;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 333;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 333;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 287;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 1232;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 1208;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 2151;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 1232;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 2151;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 2158;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 2154;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 1205;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 1217;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 1208;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 1206;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 1205;
+                }
             }
-            else if (specialization == SPECIALIZATION_3) // Retribution
+            else if (kickstarterLevel == 70)
             {
-                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1208 : -41;
-                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 2151 : -41;
-                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 2151 : -41;
-                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 2158 : -41;
-                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 2154 : -41;
-                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1205 : -41;
-                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1217 : -41;
-                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 1208 : -41;
-                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 1206 : -41;
-                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1205 : -41;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 25018;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -9;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 25028;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 25008;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 25014;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 25019;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 25015;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 25021;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 25017;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -44;
+                if (specialization == SPECIALIZATION_1) // Holy
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 25634;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 30293;
+                }
+                else if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 25787;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25996;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                }
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -44;
+                if (specialization == SPECIALIZATION_1) // Holy
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25322;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -44;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 25084;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -44;
+                }
+                else if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25154;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 25084;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -41;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25168;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -16;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -16;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -41;
+                }
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36327;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36329;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36325;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36323;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36328;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36324;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36330;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36326;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -37;
+
+                if (specialization == SPECIALIZATION_1) // Holy
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38073;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 35935;
+                }
+                else if (specialization == SPECIALIZATION_2 || specialization == SPECIALIZATION_3) // Protection, Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                }
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -37;
+                if (specialization == SPECIALIZATION_1) // Holy
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36490;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -44;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 36449;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -36;
+                }
+                else if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36490;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 36449;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -45;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36532;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Protection
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -45;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -45;
+                }
+                else if (specialization == SPECIALIZATION_3) // Retribution
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -43;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -43;
+                }
             }
             break;
         case CLASS_HUNTER:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 15684 : 24906;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 468 : -5;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12048 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -5;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 15686 : 24908;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -5;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 15680 : 24904;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -5;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 15683 : 24902;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 618 : -5;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 15685 : 24907;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -5;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 15678 : 24903;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -5;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 15679 : 24909;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -5;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 15682 : 24905;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -5;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -5;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 12005 : 25055;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -5;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 5079 : 29776;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 25937;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -5;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15278 : 25182;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 629 : -5;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = level == 60 ? 15289 : 25252;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = level == 60 ? 597 : -40;
+            if (kickstarterLevel == 60)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 15684;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 468;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12048;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 612;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 15686;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 15680;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 636;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 15683;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 618;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 15685;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 633;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 15678;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 15679;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 609;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 15682;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 612;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 12005;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 609;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 5079;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 17774;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 10249;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 609;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15278;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 629;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 15289;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 597;
+            }
+            else if (kickstarterLevel == 70)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 24906;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 24908;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 24904;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 24902;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 24907;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 24903;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 24909;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 24905;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25055;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25182;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 25252;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -40;
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36215;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36217;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36213;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36211;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36216;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36212;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36218;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36214;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36602;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 36616;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -40;
+            }
             break;
         case CLASS_ROGUE:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 15439 : 24794;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -40;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12048 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -5;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 15441 : 24796;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 15442 : 24792;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -40;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 15434 : 24790;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 15440 : 24795;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -40;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 15435 : 24791;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 15436 : 24797;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 15438 : 24793;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -40;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11992 : 25055;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 611 : -40;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15247 : 25112;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 603 : -40;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 15246 : 25111;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 603 : -40;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = level == 60 ? 29203 : 28543;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = level == 60 ? 0 : -40;
+            if (kickstarterLevel == 60)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 15439;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 636;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12048;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 612;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 15441;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 15442;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 636;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 15434;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 15440;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 633;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 15435;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 15436;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 609;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 15438;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 621;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 612;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 11992;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 611;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 17774;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 5079;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 10249;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 609;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15247;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 603;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 15246;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 603;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 29203;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+            }
+            else if (kickstarterLevel == 70)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 24794;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -5;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 24796;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 24792;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 24790;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 24795;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 24791;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 24797;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 24793;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25055;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25112;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 25111;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 28543;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -40;
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36103;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36105;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36101;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36099;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36104;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36100;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36106;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36102;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 38151;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 38155;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 36616;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -40;
+            }
             break;
         case CLASS_PRIEST:
         case CLASS_MAGE:
         case CLASS_WARLOCK:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14332 : 24681;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -37;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12027 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 14335 : 24683;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -37;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 14328 : 24679;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -37;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 14337 : 24677;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -37;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 14334 : 24682;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 888 : -37;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 14329 : 24678;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -37;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 14330 : 24684;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 14333 : 24680;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 879 : -37;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 11992 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 12017 : 25055;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -39;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -37;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15278 : 25181;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 802 : -39;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = level == 60 ? 15283 : 25294;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = level == 60 ? 854 : -39;
-            break;
-        case CLASS_DEATH_KNIGHT:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 14979 : 25018;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12048 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1208 : -41;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 14981 : 25028;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 2151 : -41;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 14975 : 25008;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 14977 : 25014;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 2151 : -41;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 14980 : 25019;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 2158 : -41;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 14978 : 25015;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 2154 : -41;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 14983 : 25021;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1205 : -41;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 14976 : 25017;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 1217 : -41;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 1208 : -41;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11980 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 1206 : -41;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 15437 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 1205 : -41;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15258 : 25168;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 1232 : -41;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
-            break;
-        case CLASS_SHAMAN:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 15684 : 24906;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -39;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12027 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 15686 : 24908;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 15680 : 24904;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -39;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 15683 : 24902;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 873 : -39;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 15685 : 24907;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 888 : -39;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 15678 : 24903;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 15679 : 24909;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 15682 : 24905;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25057;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -39;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 11992 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 864 ? 611 : -39;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15229 : 25323;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 2040 : -44;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = level == 60 ? 10367 : 25084;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 384 : -39;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
-
-            if (specialization == SPECIALIZATION_2) // Enhancement
+            if (kickstarterLevel == 60)
             {
-                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -40;
-                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 287 : -40;
-                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 639 : -40;
-                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 618 : -40;
-                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -40;
-                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -40;
-                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 611 : -40;
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15267 : 25140;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -5;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 14332;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12027;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 14335;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 14328;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 14337;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 14334;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 888;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 14329;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 14330;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 14333;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 879;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 11992;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 867;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 10659;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 17774;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 10249;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15278;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 802;
                 equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
                 equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 15283;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 854;
+            }
+            else if (kickstarterLevel == 70)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 24681;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 24683;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 24679;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 24677;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 24682;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 24678;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 24684;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 24680;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25055;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 25634;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 30293;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25181;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 25294;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -39;
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 35991;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 35993;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 35989;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 35987;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 35992;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 35988;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 35994;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 35990;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 35935;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 37555;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36546;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 36658;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = -39;
+            }
+            break;
+        case CLASS_DEATH_KNIGHT:
+            if (kickstarterLevel == 60)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 14979;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 1232;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12048;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 1208;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 14981;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 2151;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 14975;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 1232;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 14977;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 2151;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 14980;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 2158;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 14978;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 2154;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 14983;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 1205;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 14976;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 1217;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 1208;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 11980;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 1206;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 17774;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 5079;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 15437;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 1205;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15258;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 1232;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+            }
+            else if (kickstarterLevel == 70)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 25018;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 25028;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 25008;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 25014;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 25019;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 25015;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 25021;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 25017;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25168;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36327;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36329;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36325;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36323;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36328;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36324;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36330;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36326;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -7;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36532;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+            }
+            break;
+        case CLASS_SHAMAN:
+            if (kickstarterLevel == 60)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 15684;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12027;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 15686;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 15680;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 15683;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 873;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 15685;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 888;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 15678;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 15679;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 15682;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 867;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 11992;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 611;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 10659;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 17774;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 10249;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15229;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 2040;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 10367;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 384;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Enhancement
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 636;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 287;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 639;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 618;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 633;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 609;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 612;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 611;
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 17774;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 5079;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 609;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15267;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 633;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+            }
+            else if (kickstarterLevel == 70)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 24906;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 24908;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 24904;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 24902;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 24907;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 24903;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 24909;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 24905;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25057;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 25634;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 30293;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25323;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 25084;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Enhancement
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25140;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -5;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36215;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36217;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36213;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36211;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36216;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36212;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36218;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36214;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 35935;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 37555;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36686;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -44;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 36449;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Enhancement
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36504;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -41;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                    equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                }
             }
             break;
         case CLASS_DRUID:
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = level == 60 ? 10261 : 24802;
-            equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 888 : -39;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = level == 60 ? 12048 : 25070;
-            equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -39;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = level == 60 ? 10263 : 24804;
-            equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_ID] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_BODY][ITEM_RANDOM_PROPERTY] = 0; // Unused
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = level == 60 ? 10264 : 24800;
-            equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -39;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = level == 60 ? 10259 : 24798;
-            equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = level == 60 ? 10262 : 24803;
-            equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 891 : -39;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = level == 60 ? 10257 : 24799;
-            equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = level == 60 ? 10256 : 24805;
-            equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = level == 60 ? 10260 : 24801;
-            equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 876 : -39;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = level == 60 ? 12017 : 25057;
-            equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 867 : -39;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = level == 60 ? 12005 : 25056;
-            equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 865 : -39;
-            if (specialization == SPECIALIZATION_1 || specialization == SPECIALIZATION_3) // Balance, Restoration
+            if (kickstarterLevel == 60)
             {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 10659 : 25634;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 17774 : 30293;
-            }
-            else if (specialization == SPECIALIZATION_2) // Feral
-            {
-                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = level == 60 ? 17774 : 29776;
-                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = level == 60 ? 5079 : 25937;
-            }
-            equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = level == 60 ? 10249 : 25042;
-            equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 864 : -39;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = level == 60 ? 15278 : 25182;
-            equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 885 : -39;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
-            equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 10261;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 888;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 12048;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 867;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 10263;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 10264;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 10259;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 10262;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 891;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 10257;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 10256;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 10260;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 876;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 12017;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 867;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 12005;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 865;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 10659;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 17774;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 10249;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 864;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 15278;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 885;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
 
-            if (specialization == SPECIALIZATION_2) // Feral
+                if (specialization == SPECIALIZATION_2) // Feral
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = 633;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = 612;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = 636;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = 636;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = 609;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = 621;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = 612;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = 609;
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 17774;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 5079;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = 609;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = 630;
+                }
+            }
+            else if (kickstarterLevel == 70)
             {
-                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = level == 60 ? 633 : -40;
-                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -40;
-                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -40;
-                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = level == 60 ? 636 : -40;
-                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = level == 60 ? 621 : -40;
-                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = level == 60 ? 612 : -40;
-                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = level == 60 ? 609 : -40;
-                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = level == 60 ? 630 : -40;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 24802;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 25070;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 24804;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 24800;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 24798;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 24803;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 24799;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 24805;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 24801;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 25057;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 25056;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 25634;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 30293;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 25042;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 25182;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -39;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Feral
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 29776;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 25937;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -40;
+                }
+            }
+            else if (kickstarterLevel == 80)
+            {
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_ID] = 36103;
+                equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_ID] = 36435;
+                equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_ID] = 36105;
+                equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_ID] = 36101;
+                equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_ID] = 36099;
+                equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_ID] = 36104;
+                equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_ID] = 36100;
+                equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_ID] = 36106;
+                equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_ID] = 36102;
+                equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_ID] = 36421;
+                equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_ID] = 36420;
+                equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 35935;
+                equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 37555;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_ID] = 36407;
+                equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -37;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36602;
+                equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -36;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_ID] = 0;
+                equipment[EQUIPMENT_SLOT_RANGED][ITEM_RANDOM_PROPERTY] = 0;
+
+                if (specialization == SPECIALIZATION_2) // Feral
+                {
+                    equipment[EQUIPMENT_SLOT_HEAD][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_NECK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_SHOULDERS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_CHEST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WAIST][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_LEGS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FEET][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_WRISTS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_HANDS][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER1][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_FINGER2][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_TRINKET1][ITEM_ID] = 38080;
+                    equipment[EQUIPMENT_SLOT_TRINKET2][ITEM_ID] = 38081;
+                    equipment[EQUIPMENT_SLOT_BACK][ITEM_RANDOM_PROPERTY] = -40;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -40;
+                }
             }
             break;
         }
@@ -880,7 +1708,7 @@ private:
             player->GetSession()->SendDiscoverNewTaxiNode(384);
         }
 
-        if (kickstarterLevel == 70)
+        if (kickstarterLevel >= 70)
         {
             player->GetSession()->SendDiscoverNewTaxiNode(122);
             player->GetSession()->SendDiscoverNewTaxiNode(128);
@@ -921,6 +1749,74 @@ private:
                 player->GetSession()->SendDiscoverNewTaxiNode(163);
             }
         }
+        
+        if (kickstarterLevel == 80)
+        {
+            player->GetSession()->SendDiscoverNewTaxiNode(226);
+            player->GetSession()->SendDiscoverNewTaxiNode(252);
+            player->GetSession()->SendDiscoverNewTaxiNode(289);
+            player->GetSession()->SendDiscoverNewTaxiNode(294);
+            player->GetSession()->SendDiscoverNewTaxiNode(295);
+            player->GetSession()->SendDiscoverNewTaxiNode(296);
+            player->GetSession()->SendDiscoverNewTaxiNode(304);
+            player->GetSession()->SendDiscoverNewTaxiNode(305);
+            player->GetSession()->SendDiscoverNewTaxiNode(306);
+            player->GetSession()->SendDiscoverNewTaxiNode(307);
+            player->GetSession()->SendDiscoverNewTaxiNode(308);
+            player->GetSession()->SendDiscoverNewTaxiNode(309);
+            player->GetSession()->SendDiscoverNewTaxiNode(310);
+            player->GetSession()->SendDiscoverNewTaxiNode(320);
+            player->GetSession()->SendDiscoverNewTaxiNode(325);
+            player->GetSession()->SendDiscoverNewTaxiNode(326);
+            player->GetSession()->SendDiscoverNewTaxiNode(327);
+            player->GetSession()->SendDiscoverNewTaxiNode(331);
+            player->GetSession()->SendDiscoverNewTaxiNode(334);
+            player->GetSession()->SendDiscoverNewTaxiNode(340);
+
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+            {
+                player->GetSession()->SendDiscoverNewTaxiNode(183);
+                player->GetSession()->SendDiscoverNewTaxiNode(184);
+                player->GetSession()->SendDiscoverNewTaxiNode(185);
+                player->GetSession()->SendDiscoverNewTaxiNode(244);
+                player->GetSession()->SendDiscoverNewTaxiNode(245);
+                player->GetSession()->SendDiscoverNewTaxiNode(246);
+                player->GetSession()->SendDiscoverNewTaxiNode(247);
+                player->GetSession()->SendDiscoverNewTaxiNode(251);
+                player->GetSession()->SendDiscoverNewTaxiNode(253);
+                player->GetSession()->SendDiscoverNewTaxiNode(255);
+                player->GetSession()->SendDiscoverNewTaxiNode(321);
+                player->GetSession()->SendDiscoverNewTaxiNode(336);
+            }
+            else if (player->GetTeamId() == TEAM_HORDE)
+            {
+                player->GetSession()->SendDiscoverNewTaxiNode(190);
+                player->GetSession()->SendDiscoverNewTaxiNode(191);
+                player->GetSession()->SendDiscoverNewTaxiNode(192);
+                player->GetSession()->SendDiscoverNewTaxiNode(248);
+                player->GetSession()->SendDiscoverNewTaxiNode(249);
+                player->GetSession()->SendDiscoverNewTaxiNode(254);
+                player->GetSession()->SendDiscoverNewTaxiNode(256);
+                player->GetSession()->SendDiscoverNewTaxiNode(257);
+                player->GetSession()->SendDiscoverNewTaxiNode(258);
+                player->GetSession()->SendDiscoverNewTaxiNode(259);
+                player->GetSession()->SendDiscoverNewTaxiNode(260);
+                player->GetSession()->SendDiscoverNewTaxiNode(323);
+                player->GetSession()->SendDiscoverNewTaxiNode(324);
+                player->GetSession()->SendDiscoverNewTaxiNode(337);
+            }
+        }
+    }
+    
+    void AddMoney(Player* player)
+    {
+        uint32 money = kickstarterMoneyAmount[0];
+        if (kickstarterLevel == 70)
+            money = kickstarterMoneyAmount[1];
+        else if (kickstarterLevel == 80)
+            money = kickstarterMoneyAmount[2];
+
+        player->ModifyMoney(money);
     }
 
     void RemoveToken(Player* player)
@@ -941,8 +1837,13 @@ public:
         kickstarterRequireToken = sConfigMgr->GetOption<bool>("Kickstarter.RequireToken", 1);
         kickstarterLevel = sConfigMgr->GetOption<uint32>("Kickstarter.Level", 60);
 
-        if (kickstarterLevel != 60 && kickstarterLevel != 70)
+        if (kickstarterLevel != 60 && kickstarterLevel != 70 && kickstarterLevel != 80)
             kickstarterLevel = 60;
+
+        kickstarterMoney = sConfigMgr->GetOption<bool>("Kickstarter.StartWithMoney", 1);
+        kickstarterMoneyAmount[0] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.60.Money", 10000);
+        kickstarterMoneyAmount[1] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.70.Money", 100000);
+        kickstarterMoneyAmount[2] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.80.Money", 250000);
     }
 };
 

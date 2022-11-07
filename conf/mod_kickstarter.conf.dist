@@ -1,18 +1,27 @@
 [worldserver]
 
 ###############
-#
 # Require tokens to use the kickstarter feature
-#
+
 Kickstarter.RequireToken = 1
 ###############
 
 ###############
-#
 # The level that the player will be set to
 # and the equipment they will get
-# Accepted options are 60 and 70
+# Accepted options are 60, 70 or 80
 # An invalid value will reset it to 60
-#
+
 Kickstarter.Level = 60
 ###############
+
+###############
+# If the player should start with some money
+# after using the feature to help them get started
+# The amount is in copper
+
+Kickstarter.StartWithMoney = 1
+Kickstarter.Level.60.Money = 10000
+Kickstarter.Level.70.Money = 100000
+Kickstarter.Level.80.Money = 250000
+##############
