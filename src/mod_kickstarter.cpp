@@ -784,7 +784,7 @@ private:
                 }
                 else if (specialization == SPECIALIZATION_2) // Protection
                 {
-                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36490;
+                    equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_ID] = 36518;
                     equipment[EQUIPMENT_SLOT_MAINHAND][ITEM_RANDOM_PROPERTY] = -45;
                     equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_ID] = 36449;
                     equipment[EQUIPMENT_SLOT_OFFHAND][ITEM_RANDOM_PROPERTY] = -45;
