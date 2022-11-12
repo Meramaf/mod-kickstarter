@@ -21,7 +21,7 @@ Kickstarter.Level = 60
 # The amount is in copper
 
 Kickstarter.StartWithMoney = 1
-Kickstarter.Level.60.Money = 10000
-Kickstarter.Level.70.Money = 100000
-Kickstarter.Level.80.Money = 250000
+Kickstarter.Level.60.Money = 100000
+Kickstarter.Level.70.Money = 1000000
+Kickstarter.Level.80.Money = 2500000
 ##############
