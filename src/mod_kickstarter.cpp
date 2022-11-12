@@ -122,9 +122,9 @@ private:
             return;
         }
 
-        SetPlayerLevel(player, kickstarterLevel);
+        SetPlayerLevel(player);
         SetWeaponSkills(player, specialization);
-        SetEquipment(player, specialization, kickstarterLevel);
+        SetEquipment(player, specialization);
         AddTaxiPaths(player);
         AddMoney(player);
         RemoveToken(player);
@@ -157,11 +157,11 @@ private:
         return true;
     }
 
-    void SetPlayerLevel(Player* player, uint32 level)
+    void SetPlayerLevel(Player* player)
     {
-        if (player->getLevel() != level)
+        if (player->getLevel() != kickstarterLevel)
         {
-            player->SetLevel(level, true);
+            player->SetLevel(kickstarterLevel, true);
 
             player->resetTalents(true);
             player->InitTalentForLevel();
@@ -310,7 +310,7 @@ private:
         }
     }
 
-    void SetEquipment(Player* player, uint32 specialization, uint32 level)
+    void SetEquipment(Player* player, uint32 specialization)
     {
         uint32 equipment[18][2];
 
