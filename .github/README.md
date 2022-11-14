@@ -15,4 +15,6 @@ There is a config option to require tokens to use the feature. Those tokens are 
 # Note
 This module is still in a testing phase and I can't guarantee its stability. There may be issues with certain features that I have yet to discover.
 
+The code is kind of messy but it gets the job done and that's the most important thing to me. I take no responsibility for your personal experience as this is delivered as-is but will receive bugfixes and improvements.
+
 I created this because I've leveled so much over the years and I got sick of it, to the point where I'd rather start at a certain level and go from there. It is however also useful for testing purposes.
