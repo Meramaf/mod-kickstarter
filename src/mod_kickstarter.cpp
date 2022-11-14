@@ -1841,9 +1841,9 @@ public:
             kickstarterLevel = 60;
 
         kickstarterMoney = sConfigMgr->GetOption<bool>("Kickstarter.StartWithMoney", 1);
-        kickstarterMoneyAmount[0] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.60.Money", 10000);
-        kickstarterMoneyAmount[1] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.70.Money", 100000);
-        kickstarterMoneyAmount[2] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.80.Money", 250000);
+        kickstarterMoneyAmount[0] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.60.Money", 100000);
+        kickstarterMoneyAmount[1] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.70.Money", 1000000);
+        kickstarterMoneyAmount[2] = sConfigMgr->GetOption<uint32>("Kickstarter.Level.80.Money", 2500000);
     }
 };
 
